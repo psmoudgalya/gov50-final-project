@@ -1,7 +1,7 @@
 ---
 title: "Gov 50 Final Project"
-author: "Your Name Here"
-description: "My final project"
+author: "Pranav Moudgalya"
+description: "Government 50 Final Project"
 output:
   distill::distill_article:
     self_contained: false
@@ -11,4 +11,4 @@ output:
 
 ## Project thoughts
 
-I am interested in exploring data related to...
+I am interested in the fields of environmental science, sustainability, and how these fields relate to policy, economics, and markets. By collecting data of investments made by Congress-people over the last two decades, I would like to see how party affiliation may influence the types of companies that politicians invest in, especially with regards to the sustainability of these investments. 
