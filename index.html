@@ -115,7 +115,7 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   <!--/radix_placeholder_rmarkdown_metadata-->
   
   <script type="text/json" id="radix-resource-manifest">
-  {"type":"character","attributes":{},"value":["index_files/anchor-4.2.2/anchor.min.js","index_files/bowser-1.9.3/bowser.min.js","index_files/distill-2.2.21/template.v2.js","index_files/header-attrs-2.16/header-attrs.js","index_files/header-attrs-2.17/header-attrs.js","index_files/jquery-3.6.0/jquery-3.6.0.js","index_files/jquery-3.6.0/jquery-3.6.0.min.js","index_files/jquery-3.6.0/jquery-3.6.0.min.map","index_files/popper-2.6.0/popper.min.js","index_files/tippy-6.2.7/tippy-bundle.umd.min.js","index_files/tippy-6.2.7/tippy-light-border.css","index_files/tippy-6.2.7/tippy.css","index_files/tippy-6.2.7/tippy.umd.min.js","index_files/webcomponents-2.0.0/webcomponents.js"]}
+  {"type":"character","attributes":{},"value":["data/policies.csv","index_files/anchor-4.2.2/anchor.min.js","index_files/bowser-1.9.3/bowser.min.js","index_files/distill-2.2.21/template.v2.js","index_files/figure-html5/unnamed-chunk-1-1.png","index_files/figure-html5/unnamed-chunk-1-2.png","index_files/figure-html5/unnamed-chunk-2-1.png","index_files/figure-html5/unnamed-chunk-2-2.png","index_files/figure-html5/unnamed-chunk-3-1.png","index_files/header-attrs-2.16/header-attrs.js","index_files/header-attrs-2.17/header-attrs.js","index_files/jquery-3.6.0/jquery-3.6.0.js","index_files/jquery-3.6.0/jquery-3.6.0.min.js","index_files/jquery-3.6.0/jquery-3.6.0.min.map","index_files/popper-2.6.0/popper.min.js","index_files/tippy-6.2.7/tippy-bundle.umd.min.js","index_files/tippy-6.2.7/tippy-light-border.css","index_files/tippy-6.2.7/tippy.css","index_files/tippy-6.2.7/tippy.umd.min.js","index_files/webcomponents-2.0.0/webcomponents.js"]}
   </script>
   <!--radix_placeholder_navigation_in_header-->
   <!--/radix_placeholder_navigation_in_header-->
@@ -1526,6 +1526,21 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 <p>To conduct this research, we will use two datasets. Firstly, to quantify the number of climate policies passed by a country over the past three decades, we will utilize data from the Climate Policy Database. This database houses over 5,000 climate policies passed by 198 countries. To understand how per capita fossil fuel consumption and per capita renewable energy production differ by country, we will utilize the open source data from Our World in Data. To answer our first question, we will conduct a linear regression with per capita fossil fuel energy consumption of a country as our dependent variable, and the quantity of climate change policies in that country as our dependent variable. To answer the second question, we will also conduct a linear regression; the quantity of climate change policies in a country will be the independent variable, and the per capita renewable energy consumption will be the dependent variable.</p>
 <p>If our first regression (namely, that which correlates fossil fuel consumption per capita to climate policies) presents a negative coefficient, it would imply that for every unit increase in fossil fuel consumption, the number of climate policies decreases, and vice versa. Similarly, if our second regression (namely, that which correlates climate policy passage to renewable energy consumption) presents a positive coefficient, it would imply that for every unit increase in the amount of climate policies in a given country, the consumption of renewable energy per capita also increases.</p>
 <p>Through this study, we hope to elucidate whether fossil fuel consumption drives the passage of climate policy, and whether the passage of climate policy translates to greater adoption and use of renewable energy.</p>
+<h2 id="milestone-three-one-data-visualization">Milestone Three (One Data Visualization)</h2>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span><span class='va'>decisionDateHistogram</span></span></code></pre>
+</div>
+<p><img src="index_files/figure-html5/unnamed-chunk-2-1.png" width="624" /></p>
+</div>
+<p>The above graph illustrates the distribution of climate policies passed over roughly the last six years. As can be seen from the distribution, between 1960 to ~2007, there was a five-year on five-year increase in climate policies passed. After 2012, and into the past decade (2012-2022), there has been a reduction in the quantity of climate policies passed compared to the five-year period 2007-2012.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span><span class='va'>countryDistribution</span></span></code></pre>
+</div>
+<p><img src="index_files/figure-html5/unnamed-chunk-3-1.png" width="624" /></p>
+</div>
+<p>When evaluating the climate policies passed by the top ten carbon emitters (see: <a href="https://climatetrade.com/which-countries-are-the-worlds-biggest-carbon-polluters/" class="uri">https://climatetrade.com/which-countries-are-the-worlds-biggest-carbon-polluters/</a>), it it interesting to note that the US leads these countries on the quantity of climate policies passed.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
 <!--radix_placeholder_article_footer-->
 <!--/radix_placeholder_article_footer-->

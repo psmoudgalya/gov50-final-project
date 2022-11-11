@@ -26,3 +26,41 @@ If our first regression (namely, that which correlates fossil fuel consumption p
 
 Through this study, we hope to elucidate whether fossil fuel consumption drives the passage of climate policy, and whether the passage of climate policy translates to greater adoption and use of renewable energy. 
 
+## Milestone Three (One Data Visualization)
+
+```{r setup, include = FALSE}
+options(width = 200)
+library(dplyr)
+library(ggplot2)
+library(tidyverse)
+```
+
+```{r, include = FALSE}
+policy_data_raw <- read_csv("data/policies.csv")
+
+decisionDateHistogram <- ggplot(data = policy_data_raw, mapping = aes(x = decisionDate)) + xlim(1960, 2025) + geom_histogram(binwidth = 5, color = '#023020', fill = '#355e3b')  + xlab("Year of Climate Policy Passage") + ylab("Quantity of Climate Policies Passed") + ggtitle("Climate Policy Passage Over Last Six Decades")
+
+policy_data_top_polluters <- policy_data_raw |>
+  filter(country %in%  c("China", "United States of America", "India", "Russian Federation", "Japan", "Germany", "Iran", "Republic of Korea", "Saudi Arabia", "Indonesia"))
+
+polluter_order <- c("China", "United States of America", "India", "Russian Federation", "Japan", "Germany", "Iran", "Republic of Korea", "Saudi Arabia", "Indonesia")
+
+graph_country_names <- c("China", "USA", "India", "Russia", "Japan", "Germany", "Iran", "S. Korea", "S.Arabia", "Indonesia")
+
+countryDistribution <- ggplot(data = policy_data_top_polluters, mapping = aes(x = factor(country, polluter_order))) + geom_bar(color = '#023020', fill = '#355e3b') + xlab("Country") + ylab("Quantity of Climate Policies Passed Since 1960") + ggtitle("Climate Policy Passage of Top Ten Carbon Emitters", subtitle = "Greatest Carbon Polluters on Left") + scale_x_discrete(limits = polluter_order) + scale_x_discrete(labels = graph_country_names)
+
+decisionDateHistogram
+countryDistribution
+```
+
+```{r}
+decisionDateHistogram
+```
+
+The above graph illustrates the distribution of climate policies passed over roughly the last six years. As can be seen from the distribution, between 1960 to ~2007, there was a five-year on five-year increase in climate policies passed. After 2012, and into the past decade (2012-2022), there has been a reduction in the quantity of climate policies passed compared to the five-year period 2007-2012.
+
+```{r}
+countryDistribution
+```
+
+When evaluating the climate policies passed by the top ten carbon emitters (see: https://climatetrade.com/which-countries-are-the-worlds-biggest-carbon-polluters/), it it interesting to note that the US leads these countries on the quantity of climate policies passed.beca
