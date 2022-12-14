@@ -7,38 +7,29 @@ output:
     self_contained: false
 ---
 
-
-
-## Project thoughts
-
-I am interested in the fields of environmental science, sustainability, and how these fields relate to policy, economics, and markets. By collecting data of investments made by Congress-people over the last two decades, I would like to see how party affiliation may influence the types of companies that politicians invest in, especially with regards to the sustainability of these investments. To gather the relevant data for this project, I would use various data sets such as those offered by OpenSecrets, which is a nonprofit group that tracks money in US politics. I would add to these data sets by collating data from OpenSecrets with online information about how sustainable specific companies are, and by extension, how environmentally responsible the investments of US politicians are. Some factors I would like to study are the party affiliation, length in office, state, and Congress affiliation (Senate vs. House of Reps) of politicians in my dataset.
-
-## Project Proposal
-#### Note: Since my initial project thoughts, my idea has changed, reflecting the available data.
-
-As the world progresses towards international cooperation on the climate crisis, the passage of policy to remediate environmental damage and proactively prevent future climate change is an increasingly important instrument in addressing global climate change. Previous research illustrates that one of the most powerful forces in inducing the adoption of climate friendly policies in countries is the adoption of similar policies by other countries (Fankhauser et. al, 2015). However, what domestic factors influence the passage of such policies is understudied. Moreover, whether these policies actually manifest in climate-friendly economic practices is also unclear. Thus, in this research study, we seek to answer two key questions. Firstly, is the per capita fossil fuel energy consumption of a country predictive of the number of policies aimed to promote sustainability and/or mitigate climate change (herein referred to as “climate policies”) that it passes? Secondly, does the passage of climate policies within a country correlate with a positive increase in the amount of renewable energy generated in that country? 
-
-We hypothesis that in countries with higher per capita fossil fuel energy consumption, the quantity of climate policies passed will be lower. We expect that economies who are more heavily reliant on fossil fuels will also have fewer climate policies passed as climate policies usually tend to work against the use of fossil fuels. We also hypothesize that in countries where climate policies are being passed in higher numbers, there will also be increases in the amount of renewable energy consumed in that country. We expect that in countries where climate policies are passed in greater quantity, the ability for renewable energy to be economically competitive with fossil fuel will be higher, and thus be reflected in the amount of renewable energy generated in that country. 
-
-To conduct this research, we will use two datasets. Firstly, to quantify the number of climate policies passed by a country over the past three decades, we will utilize data from the Climate Policy Database. This database houses over 5,000 climate policies passed by 198 countries. To understand how per capita fossil fuel consumption and per capita renewable energy production differ by country, we will utilize the open source data from Our World in Data. To answer our first question, we will conduct a linear regression with per capita fossil fuel energy consumption of a country as our dependent variable, and the quantity of climate change policies in that country as our dependent variable. To answer the second question, we will also conduct a linear regression; the quantity of climate change policies in a country will be the independent variable, and the per capita renewable energy consumption will be the dependent variable. 
-
-If our first regression (namely, that which correlates fossil fuel consumption per capita to climate policies) presents a negative coefficient, it would imply that for every unit increase in fossil fuel consumption, the number of climate policies decreases, and vice versa. Similarly, if our second regression (namely, that which correlates climate policy passage to renewable energy consumption) presents a positive coefficient, it would imply that for every unit increase in the amount of climate policies in a given country, the consumption of renewable energy per capita also increases.
-
-Through this study, we hope to elucidate whether fossil fuel consumption drives the passage of climate policy, and whether the passage of climate policy translates to greater adoption and use of renewable energy. 
-
-## Milestone Three (One Data Visualization)
-
 ```{r setup, include = FALSE}
 options(width = 200)
 library(dplyr)
-library(ggplot2)
 library(tidyverse)
+library(tidyr)
+library(ggplot2)
+library(infer)
+library(modelsummary)
 ```
 
 ```{r, include = FALSE}
+# Loading Data
 policy_data_raw <- read_csv("data/policies.csv")
+electricity_data_raw <- read_csv("data/electricity.csv")
+carbon_data_raw <- read_csv('data/carbon.csv')
+```
 
-decisionDateHistogram <- ggplot(data = policy_data_raw, mapping = aes(x = decisionDate)) + xlim(1960, 2025) + geom_histogram(binwidth = 5, color = '#023020', fill = '#355e3b')  + xlab("Year of Climate Policy Passage") + ylab("Quantity of Climate Policies Passed") + ggtitle("Climate Policy Passage Over Last Six Decades")
+```{r}
+# Histograms Describing Independent Variables
+
+decisionDateHistogram <- ggplot(data = policy_data_raw, mapping = aes(x = decisionDate)) + xlim(1960, 2025) + geom_histogram(binwidth = 1, color = '#023020', fill = '#355e3b')  + xlab("Year of Climate Policy Passage") + ylab("Quantity of Climate Policies Passed") + ggtitle("Climate Policy Passage Over Last Six Decades")
+
+decisionDateDensity <- ggplot(data = policy_data_raw, mapping = aes(x = decisionDate)) + xlim(1960, 2025) + geom_density(color = '#023020', fill = '#355e3b')   + xlab("Year of Climate Policy Passage") + ylab("Proportion of Climate Policies Passed") + ggtitle("Climate Policy Passage Over Last Six Decades")
 
 policy_data_top_polluters <- policy_data_raw |>
   filter(country %in%  c("China", "United States of America", "India", "Russian Federation", "Japan", "Germany", "Iran", "Republic of Korea", "Saudi Arabia", "Indonesia"))
@@ -49,18 +40,112 @@ graph_country_names <- c("China", "USA", "India", "Russia", "Japan", "Germany", 
 
 countryDistribution <- ggplot(data = policy_data_top_polluters, mapping = aes(x = factor(country, polluter_order))) + geom_bar(color = '#023020', fill = '#355e3b') + xlab("Country") + ylab("Quantity of Climate Policies Passed Since 1960") + ggtitle("Climate Policy Passage of Top Ten Carbon Emitters", subtitle = "Greatest Carbon Polluters on Left") + scale_x_discrete(limits = polluter_order) + scale_x_discrete(labels = graph_country_names)
 
-decisionDateHistogram
-countryDistribution
+policy_data_modified <- policy_data_raw |>
+  filter(implementationStatus != 'NA')
+
+implementationDistribution <- ggplot(data = policy_data_modified, mapping = (aes(x = implementationStatus))) + geom_bar(color = '#023020', fill = '#355e3b') + xlab("Implementation Status") + ylab("Quantity of Policies") + ggtitle("Assesing Implementation Status of Global Climate Policies")
+```
+
+
+```{r}
+# Renewables analysis
+
+renewables_data <- policy_data_raw |>
+  mutate(renewables = if_else(grepl("Renewable", type), "1", "0")) |>
+  select(decisionDate, renewables)
+
+policy_names <- c("Other Policy", "Renewables Focused Policy")
+
+renewables_histogram <- ggplot(data = renewables_data, mapping = aes(x = renewables)) + geom_bar(color = '#023020', fill = '#355e3b') + xlab("Type of Policy") + ylab("Quantity of Policy") + ggtitle("Climate Policies With Renewable Energy Focus") + scale_x_discrete(labels = policy_names)
+
+renewables.fit <- lm(renewables ~ decisionDate, data = renewables_data)
+renewables.fit.sum <- summary(renewables.fit)
 ```
 
 ```{r}
-decisionDateHistogram
+# Regression Analysis
+electricity_data_raw <- electricity_data_raw |>
+  mutate(electricity_ff = `Electricity from fossil fuels (TWh)`)
+
+electricity_data_US <- electricity_data_raw |>
+   filter(Entity %in%  c("United States"))
+
+electricity_data_China <- electricity_data_raw |>
+   filter(Entity %in%  c("China"))
+  
+fit.us.year <- lm(electricity_ff ~ Year, data = electricity_data_US)
+fit.us.year.sum <- summary(fit.us.year)
+
+fit.china.year <- lm(electricity_ff ~ Year, data = electricity_data_China)
+fit.china.year.sum <- summary(fit.china.year)
 ```
 
-The above graph illustrates the distribution of climate policies passed over roughly the last six years. As can be seen from the distribution, between 1960 to ~2007, there was a five-year on five-year increase in climate policies passed. After 2012, and into the past decade (2012-2022), there has been a reduction in the quantity of climate policies passed compared to the five-year period 2007-2012.
+```{r}
+# Scatter Plot of Fossil Fuel Usage and Atmospheric Carbon
+
+scatter_plot = ggplot(data = carbon_data_raw, mapping = aes(x = fossilFuelAndIndustry, y = atmosphericCarbonGrowth)) + geom_point() + geom_smooth(method = 'lm', se = TRUE) + xlab("Emissions from Fossil Fuel Combustion and Industrial Processes") + ylab("Atmospheric CO2 Growth Rate") + ggtitle("Relationship Between Fossil Fuels and Atmospheric Carbon", subtitle = "All values in billion tonnes of carbon per year (GtC/yr)") 
+
+# Multiple Regression
+atmospheric_carbon_predictors <- lm(atmosphericCarbonGrowth ~ fossilFuelAndIndustry + landUseChangeEmissions, data = carbon_data_raw)
+modelsummary <- modelsummary::modelsummary(atmospheric_carbon_predictors,
+                           statistic = c("s.e. = {std.error}",
+                                         "p = {p.value}"),
+                           gof_map = c("nobs", "r.squared", "adj.r.squared"))
+```
+# Introduction
+
+## Research Motivation and Questions
+Climate change is an intrinsically multifaceted issue. The scientific conception of what climate change is, how it can be mitigated, what role policy plays in regulating climate change, among others, are all questions that cross interdisciplinary lines. Indeed, a nuanced and evolving understanding of niche fields such as resource economics, climate governance, and atmospheric chemistry are key to understanding and hence mitigating this global crisis. In this project, we seek to describe the climate policy landscape and also understand the relationship between fossil fuel emissions and global atmospheric carbon. This project is meant to utilize data wrangling and visualization techniques taught in Harvard's Government 50 to answer key questions in the social and natural sciences.
+
+Specifically, we ask the following questions:
+* Are countries passing more climate policies now than in the past?
+* Of the world's top polluters, what is the relative distribution of climate policies they have passed?
+* Of the climate policies which have passed, which policies are still in effect?
+* Of the climate policies which have passed, how many policies relate to the adoption or development of renewable energy?
+* Is there a relationship between time (evaluated in a year-on-year basis) and the amount of renewables related policies that have passed?
+* Is there a relationship between time (evaluated in a year-on-year basis) and the amount of electricity that the United States and China generate from fossil fuels?
+* What is the relationship between fossil fuel and emissions from fossil fuel combustion and industrial processes and the atmospheric CO2 growth rate? And, is this relationship stronger than the relationship between emissions from land-use change and the atmospheric CO2 growth rate?
+
+## Description of Design and Data
+In answering our questions, we utilized open-source datasets from a variety of sources. To answer questions related to policy passage, we downloaded data from the Climate Policy Database, a database of over 5,000 climate policies from almost every country passed since the 1960s. To answer questions related to the electricity generated from fossil fuel consumption, we downloaded data from Our World in Data 2021. Lastly, to answer questions related to atmospheric carbon, we downloaded data from the Open Climate Data project on Github. All of our data sources and their attributions are listed below, and can be found on the Github repository for this project.
+
+1. "Climate Policy Database", climatepolicydatabase.org, Accessed: December 2022
+2. "Electricity generation from fossil fuels, 2021", Our World in Data, https://ourworldindata.org/grapher/electricity-fossil-fuels, Accessed: December 2022
+3. ""Global Carbon Budget", Open Climate Data, https://github.com/openclimatedata/global-carbon-budget, Accessed: December 2022
+
+This study is not observational. Instead, it is descriptive, as explained by D. A. De Vaus in 'Research Design in Social Research': [descriptive studies] 'help provide answers to the questions of who, what, when, where, and how associated with a particular research problem'. Hence, this work is not meant to describe treatment effects involving observations or experiments, but rather, utilized the statistical techniques learned in class to describe data relevant to our research questions.
+
+# Climate Policies
+
+Climate policy has been used as an effective tool at mitigating the causes of climate change (Fekete et. al. 2021). However, over the last roughly half-century, are climate policies being passed with greater frequency? The kernel density plot and histogram below provides key insights.
+
+```{r}
+decisionDateDensity
+decisionDateHistogram
+```
+As the kernel density plot illustrates, in general, there has been a trend for an increasing number of climate policies being passed globally year-on-year. Since 2015, there seems to be a decrease in the number of climate policies passed. Consulting the histogram, we can see that 2009 was a global high for number of climate policies passed. 
+
+Globally, the top ten polluters (measured by carbon emissions) are China, the United States of America, India, Russia, Japan, Germany, Iran, South Korea, Saudi Arabia, Indonesia. Within these countries, what is the distribution of climate policies being passed? The barplot below seeks to answer this question.
 
 ```{r}
 countryDistribution
 ```
+As the graph illustrates, of the top global polluters, the United States leads in the number of climate policies being passed (passing almost double the amount of climate policies compared to the next leading climate policy passer), with China, India, Japan, and Germany all passing roughly the same number of policies since 1960.
 
-When evaluating the climate policies passed by the top ten carbon emitters (see: https://climatetrade.com/which-countries-are-the-worlds-biggest-carbon-polluters/), it it interesting to note that the US leads these countries on the quantity of climate policies passed.beca
+While policies may be passed, not all policies end up lasting. Changing governments and legislatures with changing attitudes towards climate change can cause climate policies that were once implemented to be lapsed. What are the implementation statuses of climate policies globally? The barplot below describes how climate policies are categorized as of 2021.
+
+```{r}
+implementationDistribution
+```
+As the graph illustrates, fortunately, the overwhelming majority of climate policies that were passed are still in force. However, roughly 17% of all climate policies that were passed have been ended.
+
+```{r}
+renewables_histogram
+renewables.fit.sum
+fit.us.year.sum
+fit.china.year.sum 
+scatter_plot
+modelsummary
+```
+
+
